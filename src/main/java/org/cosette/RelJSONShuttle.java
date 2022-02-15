@@ -84,6 +84,12 @@ public class RelJSONShuttle implements RelShuttle {
         for (RelOptTable table : tableList) {
             ObjectNode tableObject = mapper.createObjectNode();
 
+            tableObject.put("name", table.getQualifiedName().get(table.getQualifiedName().size() - 1));
+            ArrayNode fieldArray = tableObject.putArray("fields");
+            for (String field: table.getRowType().getFieldNames()) {
+                fieldArray.add(field);
+            }
+
             ArrayNode typeArray = tableObject.putArray("types");
             for (RelDataTypeField field : table.getRowType().getFieldList()) {
                 typeArray.add(field.getType().getSqlTypeName().name());

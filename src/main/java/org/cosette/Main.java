@@ -17,12 +17,10 @@ import java.util.regex.Pattern;
  */
 public class Main {
 
-    public static void main(String[] args) throws IOException {
-        Process mysql = Runtime.getRuntime().exec("cmd mysqld");
+    public static void main(String[] args) {
         for (String filename : args) {
             parseFile(filename);
         }
-        mysql.destroy();
     }
 
     /**
