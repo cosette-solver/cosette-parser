@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -52,14 +53,16 @@ public class SQLParse {
     /**
      * Dump the parsed statements to a file.
      *
-     * @param file The given file.
+     * @param name The file name.
      */
-    public void dumpToJSON(File file) throws IOException {
-        ArrayList<RelNode> nodeList = new ArrayList<>();
-        for (RelRoot root : rootList) {
-            nodeList.add(root.project());
+    public void dumpToJSON(String name) throws IOException {
+        ArrayList<RelNode> nodeList;
+        for (int i = 1; i < rootList.size(); i += 1) {
+            nodeList = new ArrayList<>(Arrays.asList(rootList.get(0).project(), rootList.get(i).project()));
+            File file = new File(name + i +".json");
+            RelJSONShuttle.dumpToJSON(nodeList, file);
         }
-        RelJSONShuttle.dumpToJSON(nodeList, file);
+
     }
 
 }

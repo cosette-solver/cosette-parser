@@ -70,9 +70,8 @@ public class Main {
                     }
                 }
             }
-            String outputPath = FilenameUtils.getPath(filename) + FilenameUtils.getBaseName(filename) + ".json";
-            File outputFile = new File(outputPath);
-            sqlParse.dumpToJSON(outputFile);
+            String outputName = FilenameUtils.getPath(filename) + FilenameUtils.getBaseName(filename);
+            sqlParse.dumpToJSON(outputName);
             scanner.close();
         } catch (Exception e) {
             System.err.println("In file:\n\t" + filename);
