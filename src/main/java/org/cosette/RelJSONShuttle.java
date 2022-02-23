@@ -211,10 +211,10 @@ public class RelJSONShuttle implements RelShuttle {
 
         ObjectNode filter = environment.createNode();
         ObjectNode filterArguments = environment.createNode();
-        ObjectNode condition = environment.createNode();
-        condition.put("operator", "TRUE");
-        condition.putArray("operand");
-        condition.put("type", "BOOLEAN");
+        ObjectNode and = environment.createNode();
+        and.put("operator", "AND");
+        ArrayNode condition = and.putArray("operand");
+        and.put("type", "BOOLEAN");
         List<Integer> groups = new ArrayList<>(aggregate.getGroupSet().asList());
         List<RelDataTypeField> types = aggregate.getInput().getRowType().getFieldList();
         for (int index = 0; index < groups.size(); index++) {
@@ -226,16 +226,12 @@ public class RelJSONShuttle implements RelShuttle {
             equivalence.put("operator", "=");
             equivalence.putArray("operand").add(leftColumn).add(rightColumn);
             equivalence.put("type", "BOOLEAN");
-            ObjectNode and = environment.createNode();
-            and.put("operator", "AND");
-            and.putArray("operand").add(condition).add(equivalence);
-            and.put("type", "BOOLEAN");
-            condition = and;
+            condition.add(equivalence);
         }
         inputProjectArguments.set("source", childShuttle.getRelNode());
         inputProject.set("project", inputProjectArguments);
         RelJSONShuttle filterChildShuttle = visitChild(aggregate.getInput(), environment.amend(null, groupCount));
-        filterArguments.set("condition", condition);
+        filterArguments.set("condition", and);
         filterArguments.set("source", filterChildShuttle.getRelNode());
         filter.set("filter", filterArguments);
 
