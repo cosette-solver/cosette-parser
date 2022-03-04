@@ -24,22 +24,21 @@ public class SchemaGenerator {
         Properties info = new Properties();
         info.setProperty(CalciteConnectionProperty.LEX.camelName(), "mysql");
         info.setProperty(CalciteConnectionProperty.FUN.camelName(), "standard");
+        info.setProperty(CalciteConnectionProperty.QUOTING.camelName(), "double_quote");
         info.setProperty(CalciteConnectionProperty.FORCE_DECORRELATE.camelName(), "false");
         info.setProperty(CalciteConnectionProperty.MATERIALIZATIONS_ENABLED.camelName(), "false");
-        info.setProperty(CalciteConnectionProperty.QUOTING.camelName(), "back_tick");
         info.setProperty(CalciteConnectionProperty.PARSER_FACTORY.camelName(), ServerDdlExecutor.class.getName() + "#PARSER_FACTORY");
         calciteConnection = DriverManager.getConnection("jdbc:calcite:", info).unwrap(CalciteConnection.class);
     }
 
     /**
-     * Execute a DDL statement.
+     * Execute a DML statement.
      *
-     * @param ddl The given DDL statement.
+     * @param dml The given DML statement.
      */
-    public void applyDDL(String ddl) throws SQLException {
-//        Statement statement = dataSource.getConnection().createStatement();
+    public void applyDML(String dml) throws SQLException {
         Statement statement = calciteConnection.createStatement();
-        statement.executeUpdate(ddl);
+        statement.executeUpdate(dml);
         statement.close();
     }
 

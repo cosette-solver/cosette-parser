@@ -19,7 +19,7 @@ import java.util.List;
 public class SQLParse {
 
     private final SchemaGenerator schemaGenerator;
-    private final List<RelRoot> rootList;
+    public final List<RelRoot> rootList;
 
     /**
      * Create a new instance by setting up the SchemaGenerator instance and the list of RelRoot within.
@@ -34,8 +34,8 @@ public class SQLParse {
      *
      * @param ddl The DDL statement to be applied.
      */
-    public void applyDDL(String ddl) throws SQLException, SqlParseException {
-        schemaGenerator.applyDDL(ddl);
+    public void applyDML(String ddl) throws SQLException {
+        schemaGenerator.applyDML(ddl);
     }
 
     /**
@@ -59,7 +59,7 @@ public class SQLParse {
         ArrayList<RelNode> nodeList;
         for (int i = 1; i < rootList.size(); i += 1) {
             nodeList = new ArrayList<>(Arrays.asList(rootList.get(0).project(), rootList.get(i).project()));
-            File file = new File(name + i +".json");
+            File file = new File(name + "-" + i + ".json");
             RelJSONShuttle.dumpToJSON(nodeList, file);
         }
 

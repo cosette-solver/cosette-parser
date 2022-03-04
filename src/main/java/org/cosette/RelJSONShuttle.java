@@ -354,13 +354,12 @@ public class RelJSONShuttle implements RelShuttle {
      */
     @Override
     public RelNode visit(LogicalProject project) {
-        // TODO: Correlation in targets?
         ObjectNode arguments = environment.createNode();
         ArrayNode parameters = arguments.putArray("target");
         RelJSONShuttle childShuttle = visitChild(project.getInput(), environment);
         List<RexNode> projects = project.getProjects();
         for (RexNode projection : projects) {
-            parameters.add(visitRexNode(projection, environment, projects.size()).getRexNode());
+            parameters.add(visitRexNode(projection, environment, project.getInput().getRowType().getFieldCount()).getRexNode());
         }
         arguments.set("source", childShuttle.getRelNode());
         relNode.set("project", arguments);
@@ -377,10 +376,9 @@ public class RelJSONShuttle implements RelShuttle {
 
     @Override
     public RelNode visit(LogicalJoin join) {
-        // TODO: Correlation in condition?
         ObjectNode arguments = environment.createNode();
         arguments.put("kind", join.getJoinType().toString());
-        arguments.set("condition", visitRexNode(join.getCondition(), environment, 0).getRexNode());
+        arguments.set("condition", visitRexNode(join.getCondition(), environment, join.getLeft().getRowType().getFieldCount() + join.getRight().getRowType().getFieldCount()).getRexNode());
         arguments.set("left", visitChild(join.getLeft(), environment).getRelNode());
         arguments.set("right", visitChild(join.getRight(), environment).getRelNode());
         relNode.set("join", arguments);
@@ -469,10 +467,10 @@ public class RelJSONShuttle implements RelShuttle {
             column.add(index).add(types.get(index).getType().getSqlTypeName().name()).add(collation.shortString());
         }
         if (sort.offset != null) {
-            arguments.set("offset", visitRexNode(sort.offset, environment, 0).getRexNode());
+            arguments.set("offset", visitRexNode(sort.offset, environment, sort.getInput().getRowType().getFieldCount()).getRexNode());
         }
         if (sort.fetch != null) {
-            arguments.set("limit", visitRexNode(sort.fetch, environment, 0).getRexNode());
+            arguments.set("limit", visitRexNode(sort.fetch, environment, sort.getInput().getRowType().getFieldCount()).getRexNode());
         }
         arguments.set("source", childShuttle.getRelNode());
         relNode.set("sort", arguments);

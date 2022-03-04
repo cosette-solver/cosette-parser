@@ -1,12 +1,10 @@
 package org.cosette;
 
-import org.apache.calcite.sql.parser.SqlParseException;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -60,13 +58,14 @@ public class Main {
                 String statement = scanner.next().trim();
                 if (!statement.isBlank()) {
                     try {
-                        try {
+                        if (statement.contains("CREATE")) {
+                            sqlParse.applyDML(statement);
+                        } else {
                             sqlParse.parseDML(statement);
-                        } catch (SqlParseException ignore) {
-                            sqlParse.applyDDL(statement);
                         }
                     } catch (Exception e) {
-                        throw new Exception("In statement:\n" + statement.replaceAll("(?m)^", "\t") + "\n" + e.getMessage());
+                        System.err.println("In statement:\n" + statement.replaceAll("(?m)^", "\t"));
+                        throw e;
                     }
                 }
             }
@@ -75,7 +74,11 @@ public class Main {
             scanner.close();
         } catch (Exception e) {
             System.err.println("In file:\n\t" + filename);
-            System.err.println(e.getMessage().trim() + "\n");
+            String message = e.getMessage();
+            if (message.contains("\n")) {
+                message = message.substring(0, message.indexOf("\n"));
+            }
+            System.err.println(message + "\n");
         }
     }
 
