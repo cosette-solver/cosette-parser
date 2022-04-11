@@ -1,5 +1,6 @@
 package org.cosette;
 
+import org.apache.calcite.avatica.util.Quoting;
 import org.apache.calcite.config.Lex;
 import org.apache.calcite.jdbc.CalciteSchema;
 import org.apache.calcite.rel.logical.LogicalFilter;
@@ -18,6 +19,7 @@ import org.apache.calcite.sql.parser.SqlParser;
 import org.apache.calcite.sql.parser.SqlParserPos;
 import org.apache.calcite.sql.parser.ddl.SqlDdlParserImpl;
 import org.apache.calcite.sql.type.SqlTypeName;
+import org.apache.calcite.sql.validate.SqlConformanceEnum;
 import org.apache.calcite.util.ImmutableBitSet;
 
 import java.util.*;
@@ -30,7 +32,9 @@ public class SchemaGenerator {
     final CosetteSchema schema = new CosetteSchema();
     private final SqlParser.Config schemaParserConfig = SqlParser.Config.DEFAULT
             .withParserFactory(SqlDdlParserImpl.FACTORY)
-            .withLex(Lex.MYSQL);
+            .withLex(Lex.MYSQL)
+            .withQuoting(Quoting.DOUBLE_QUOTE)
+            .withConformance(SqlConformanceEnum.LENIENT);
 
     /**
      * Create a SchemaGenerator instance by setting up a connection to JDBC.

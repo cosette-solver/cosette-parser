@@ -1,6 +1,5 @@
 package org.cosette;
 
-import org.apache.calcite.rel.RelNode;
 import org.apache.calcite.rel.RelRoot;
 import org.apache.calcite.sql.SqlNode;
 
@@ -52,12 +51,15 @@ public class SQLParse {
      *
      * @param file The given file.
      */
-    public void dumpToJSON(File file) throws IOException {
-        ArrayList<RelNode> nodeList = new ArrayList<>();
-        for (RelRoot root : rootList) {
-            nodeList.add(root.project());
+    public void dumpToJSON(String path) throws IOException {
+        File tasks = new File(path + ".batch");
+        tasks.mkdir();
+        for (int i = 1; i < rootList.size(); i += 1) {
+            File task = new File(tasks.getPath(), i + ".json");
+            RelJSONShuttle.dumpToJSON(List.of(rootList.get(0).project(), rootList.get(i).project()), task);
         }
-        RelJSONShuttle.dumpToJSON(nodeList, file);
+
+
     }
 
 }
