@@ -3,14 +3,11 @@ package org.cosette;
 import org.apache.calcite.rel.RelNode;
 import org.apache.calcite.rel.RelRoot;
 import org.apache.calcite.sql.SqlNode;
-import org.apache.calcite.sql.parser.SqlParseException;
-import org.apache.calcite.tools.ValidationException;
 
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -19,7 +16,7 @@ import java.util.List;
 public class SQLParse {
 
     private final SchemaGenerator schemaGenerator;
-    public final List<RelRoot> rootList;
+    private final List<RelRoot> rootList;
 
     /**
      * Create a new instance by setting up the SchemaGenerator instance and the list of RelRoot within.
@@ -34,8 +31,8 @@ public class SQLParse {
      *
      * @param ddl The DDL statement to be applied.
      */
-    public void applyDML(String ddl) throws SQLException {
-        schemaGenerator.applyDML(ddl);
+    public void applyDDL(String ddl) throws Exception {
+        schemaGenerator.applyDDL(ddl);
     }
 
     /**
@@ -43,7 +40,7 @@ public class SQLParse {
      *
      * @param dml The DML statement to be parsed.
      */
-    public void parseDML(String dml) throws SqlParseException, ValidationException {
+    public void parseDML(String dml) throws Exception {
         RawPlanner planner = schemaGenerator.createPlanner();
         SqlNode sqlNode = planner.parse(dml);
         RelRoot relRoot = planner.rel(sqlNode);
@@ -53,16 +50,14 @@ public class SQLParse {
     /**
      * Dump the parsed statements to a file.
      *
-     * @param name The file name.
+     * @param file The given file.
      */
-    public void dumpToJSON(String name) throws IOException {
-        ArrayList<RelNode> nodeList;
-        for (int i = 1; i < rootList.size(); i += 1) {
-            nodeList = new ArrayList<>(Arrays.asList(rootList.get(0).project(), rootList.get(i).project()));
-            File file = new File(name + "-" + i + ".json");
-            RelJSONShuttle.dumpToJSON(nodeList, file);
+    public void dumpToJSON(File file) throws IOException {
+        ArrayList<RelNode> nodeList = new ArrayList<>();
+        for (RelRoot root : rootList) {
+            nodeList.add(root.project());
         }
-
+        RelJSONShuttle.dumpToJSON(nodeList, file);
     }
 
 }

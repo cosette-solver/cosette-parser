@@ -111,6 +111,7 @@ public class RelJSONShuttle implements RelShuttle {
                 }
             }
 
+            // FOREIGN KEY IS NOT SUPPORTED BY CALCITE YET.
             ArrayNode foreignArray = tableObject.putArray("foreign");
             List<RelReferentialConstraint> constraints = table.getReferentialConstraints();
             if (constraints != null) {
@@ -127,6 +128,17 @@ public class RelJSONShuttle implements RelShuttle {
                     }
                 }
             }
+
+            CosetteTable raw = table.unwrap(CosetteTable.class);
+            if (raw != null) {
+                ArrayNode checkArray = tableObject.putArray("guaranteed");
+                for (RexNode check : raw.deriveCheckConstraint()) {
+                    //TODO: New table introduced in check?
+                    RexJSONVisitor checkVisitor = new RexJSONVisitor(new Environment(mapper, new ArrayList<>(tableList)), table.getRowType().getFieldCount());
+                    checkArray.add(check.accept(checkVisitor));
+                }
+            }
+
 
             schemaArray.add(tableObject);
         }

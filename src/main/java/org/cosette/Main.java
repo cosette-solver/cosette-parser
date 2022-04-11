@@ -58,27 +58,23 @@ public class Main {
                 String statement = scanner.next().trim();
                 if (!statement.isBlank()) {
                     try {
-                        if (statement.contains("CREATE")) {
-                            sqlParse.applyDML(statement);
+                        if (statement.toUpperCase().startsWith("CREATE TABLE")) {
+                            sqlParse.applyDDL(statement);
                         } else {
                             sqlParse.parseDML(statement);
                         }
                     } catch (Exception e) {
-                        System.err.println("In statement:\n" + statement.replaceAll("(?m)^", "\t"));
-                        throw e;
+                        throw new Exception("In statement:\n" + statement.replaceAll("(?m)^", "\t") + "\n" + e.getMessage());
                     }
                 }
             }
-            String outputName = FilenameUtils.getPath(filename) + FilenameUtils.getBaseName(filename);
-            sqlParse.dumpToJSON(outputName);
+            String outputPath = FilenameUtils.getPath(filename) + FilenameUtils.getBaseName(filename) + ".json";
+            File outputFile = new File(outputPath);
+            sqlParse.dumpToJSON(outputFile);
             scanner.close();
         } catch (Exception e) {
             System.err.println("In file:\n\t" + filename);
-            String message = e.getMessage();
-            if (message.contains("\n")) {
-                message = message.substring(0, message.indexOf("\n"));
-            }
-            System.err.println(message + "\n");
+            System.err.println(e.toString().trim() + "\n");
         }
     }
 
@@ -141,7 +137,7 @@ public class Main {
             parseSQLFile(intermediate);
         } catch (Exception e) {
             System.err.println("In file:\n\t" + filename);
-            System.err.println(e.getMessage().trim() + "\n");
+            System.err.println(e.toString().trim() + "\n");
         }
     }
 
