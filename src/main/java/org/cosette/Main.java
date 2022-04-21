@@ -68,7 +68,7 @@ public class Main {
                     }
                 }
             }
-            String outputPath = FilenameUtils.getPath(filename) + FilenameUtils.getBaseName(filename);
+            String outputPath = FilenameUtils.getFullPath(filename) + FilenameUtils.getBaseName(filename);
             sqlParse.dumpToJSON(outputPath);
             scanner.close();
         } catch (Exception e) {
